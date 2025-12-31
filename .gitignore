@@ -262,6 +262,8 @@ docker-compose.override.yml
 *.weights
 *.onnx
 *.tflite
+*.bin
+*.safetensors
 # 작은 모델 파일은 필요시 커밋 가능
 # !**/app/yolo/yolov8n.pt
 
