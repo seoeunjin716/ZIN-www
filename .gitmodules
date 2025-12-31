@@ -1,0 +1,3 @@
+[submodule "api.seoeunjin.com"]
+	path = api.seoeunjin.com
+	url = https://github.com/seoeunjin716/ZIN-api.git
