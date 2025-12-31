@@ -1,0 +1,465 @@
+# ============================================================================
+# 통합 Docker Compose 설정
+# ============================================================================
+# Gateway (api.seoeunjin.com) + Transformer Service (ai.seoeunjin.com/transformerservice)
+#
+# 사용 예시:
+#   - 기본 실행 (gateway + transformerservice):
+#     docker compose up
+#
+#   - 백그라운드 실행:
+#     docker compose up -d
+#
+#   - 특정 서비스만 실행:
+#     docker compose up gateway
+#     docker compose up transformerservice
+#
+# 주의사항:
+#   1. Docker Desktop이 실행 중이어야 합니다.
+#   2. 루트 디렉토리에 .env 파일 생성 (env.template 참고)
+#   3. Neon PostgreSQL과 Upstash Redis 정보를 .env에 설정
+#   4. Transformer Service는 메모리 사용량이 큽니다 (최소 2GB 권장)
+# ============================================================================
+
+services:
+  # ========================================================================
+  # Gateway Service (Spring Boot)
+  # ========================================================================
+  gateway:
+    build:
+      context: ./api.seoeunjin.com
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - seoeunjin-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-default}
+      - SPRING_DATASOURCE_URL=${DATABASE_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      - SPRING_JPA_SHOW_SQL=${SPRING_JPA_SHOW_SQL:-true}
+      - SPRING_REDIS_HOST=${REDIS_HOST}
+      - SPRING_REDIS_PORT=${REDIS_PORT}
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - SPRING_REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+      - JWT_SECRET=${JWT_SECRET}
+    env_file:
+      - .env
+    restart: on-failure
+
+  # ========================================================================
+  # OAuth Service (Spring Boot) - 주석 처리됨
+  # ========================================================================
+  # oauthservice:
+  #   build:
+  #     context: ./core.seoeunjin.com/oauthservice
+  #     dockerfile: Dockerfile
+  #   container_name: oauthservice
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-default}
+  #     - SPRING_DATASOURCE_URL=${DATABASE_URL}
+  #     - SPRING_DATASOURCE_USERNAME=${DB_USER}
+  #     - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+  #     - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+  #     - SPRING_REDIS_HOST=${REDIS_HOST}
+  #     - SPRING_REDIS_PORT=${REDIS_PORT}
+  #     - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - SPRING_REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
+  #     - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+  #     - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+  #     - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+  #     - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+  #   env_file:
+  #     - .env
+  #   restart: on-failure
+
+  # ========================================================================
+  # User Service (Spring Boot) - 주석 처리됨
+  # ========================================================================
+  # userservice:
+  #   build:
+  #     context: ./core.seoeunjin.com/userservice
+  #     dockerfile: Dockerfile
+  #   container_name: userservice
+  #   ports:
+  #     - "8082:8082"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-default}
+  #     - SPRING_DATASOURCE_URL=${DATABASE_URL}
+  #     - SPRING_DATASOURCE_USERNAME=${DB_USER}
+  #     - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+  #     - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+  #   env_file:
+  #     - .env
+  #   restart: on-failure
+
+  # ========================================================================
+  # ERP Services (FastAPI) - 주석 처리됨
+  # ========================================================================
+  # customerservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: customerservice/Dockerfile
+  #   container_name: customerservice
+  #   ports:
+  #     - "9009:9009"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # dashboardservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: dashboardservice/Dockerfile
+  #   container_name: dashboardservice
+  #   ports:
+  #     - "9008:9008"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # orderservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: orderservice/Dockerfile
+  #   container_name: orderservice
+  #   ports:
+  #     - "9007:9007"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # reportservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: reportservice/Dockerfile
+  #   container_name: reportservice
+  #   ports:
+  #     - "9006:9006"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # settingservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: settingservice/Dockerfile
+  #   container_name: settingservice
+  #   ports:
+  #     - "9005:9005"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # stockservice:
+  #   build:
+  #     context: ./erp.seoeunjin.com
+  #     dockerfile: stockservice/Dockerfile
+  #   container_name: stockservice
+  #   ports:
+  #     - "9004:9004"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - erp
+  #   restart: on-failure
+
+  # ========================================================================
+  # AI Services (FastAPI) - 주석 처리됨 (mlservice 제외)
+  # ========================================================================
+  # ai-authservice:
+  #   build:
+  #     context: ./ai.seoeunjin.com
+  #     dockerfile: authservice/Dockerfile
+  #   container_name: ai-authservice
+  #   ports:
+  #     - "9002:9002"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - ai
+  #   restart: on-failure
+
+  # crawlerservice:
+  #   build:
+  #     context: ./ai.seoeunjin.com
+  #     dockerfile: crawlerservice/Dockerfile
+  #   container_name: crawlerservice
+  #   ports:
+  #     - "9001:9001"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - ai
+  #   restart: on-failure
+
+  # chatbotservice:
+  #   build:
+  #     context: ./ai.seoeunjin.com
+  #     dockerfile: chatbotservice/Dockerfile
+  #   container_name: chatbotservice
+  #   ports:
+  #     - "9003:9003"
+  #   networks:
+  #     - seoeunjin-network
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   profiles:
+  #     - ai
+  #   restart: on-failure
+
+  # ========================================================================
+  # ML Service (FastAPI) - 주석 처리됨 (gateway + transformerservice만 실행)
+  # ========================================================================
+  # mlservice:
+  #   build:
+  #     context: ./ai.seoeunjin.com
+  #     dockerfile: mlservice/Dockerfile
+  #   container_name: mlservice
+  #   ports:
+  #     - "9010:9010"
+  #   networks:
+  #     - seoeunjin-network
+  #   volumes:
+  #     - ./ai.seoeunjin.com/mlservice/app/download:/app/download # 로컬 download 폴더를 컨테이너 /app/download에 마운트
+  #     - ./ai.seoeunjin.com/mlservice/app/seoul_crime/save:/app/app/seoul_crime/save # 로컬 save 폴더를 컨테이너 /app/app/seoul_crime/save에 마운트
+  #     - ./ai.seoeunjin.com/mlservice/app/nlp/save:/app/app/nlp/save # NLP 워드클라우드 기본 저장 경로 마운트
+  #   environment:
+  #     - DATABASE_URL=${DATABASE_URL}
+  #     - DB_HOST=${DB_HOST}
+  #     - DB_PORT=${DB_PORT}
+  #     - DB_NAME=${DB_NAME}
+  #     - DB_USER=${DB_USER}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #   env_file:
+  #     - .env
+  #   restart: on-failure
+
+  # ========================================================================
+  # Transformer Service (FastAPI) - KoELECTRA 감성 분석 서비스
+  # ========================================================================
+  transformerservice:
+    build:
+      context: ./ai.seoeunjin.com
+      dockerfile: transformerservice/Dockerfile
+    container_name: transformerservice
+    ports:
+      - "9000:9000"
+    networks:
+      - seoeunjin-network
+    volumes:
+      - ./ai.seoeunjin.com/transformerservice/app/koelectra/koelectra_model:/app/app/koelectra/koelectra_model # 모델 파일 마운트
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - USE_GPU=${USE_GPU:-false} # GPU 사용 여부 (기본값: false)
+    env_file:
+      - .env
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          memory: 4G # 모델 로딩을 위한 메모리 제한
+        reservations:
+          memory: 2G # 최소 메모리 보장
+
+# ========================================================================
+# Networks
+# ========================================================================
+networks:
+  seoeunjin-network:
+    driver: bridge
+    name: seoeunjin-network
+
+# ========================================================================
+# 사용법
+# ========================================================================
+# 1. .env 파일 생성: env.template을 참고하여 .env 파일 생성
+# 2. Neon PostgreSQL과 Upstash Redis 정보 입력
+# 3. 기본 실행 (gateway + transformerservice): docker compose up
+# 4. 백그라운드 실행: docker compose up -d
+# 5. 특정 서비스만 실행:
+#    - docker compose up gateway
+#    - docker compose up transformerservice
+# ========================================================================

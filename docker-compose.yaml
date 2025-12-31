@@ -1,0 +1,141 @@
+# ============================================================================
+# 통합 Docker Compose 설정
+# ============================================================================
+# API Service (모놀리식 - Gateway + OAuth + User 통합) + Transformer Service
+#
+# 사용 예시:
+#   - 기본 실행 (gateway + transformerservice):
+#     docker compose up
+#
+#   - 백그라운드 실행:
+#     docker compose up -d
+#
+#   - 특정 서비스만 실행:
+#     docker compose up gateway
+#     docker compose up transformerservice
+#
+# 주의사항:
+#   1. Docker Desktop이 실행 중이어야 합니다.
+#   2. 루트 디렉토리에 .env 파일 생성 (api.seoeunjin.com/ENV_TEMPLATE.txt 참고)
+#   3. Neon PostgreSQL과 Upstash Redis 정보를 .env에 설정
+#   4. OAuth 클라이언트 정보 (Kakao, Google, Naver)를 .env에 설정
+#   5. Transformer Service는 메모리 사용량이 큽니다 (최소 2GB 권장)
+# ============================================================================
+
+services:
+  # ========================================================================
+  # API Service (모놀리식 구조 - Gateway + OAuth + User 통합)
+  # ========================================================================
+  gateway:
+    build:
+      context: ./api.seoeunjin.com
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_PORT:-8080}"
+    networks:
+      - seoeunjin-network
+    environment:
+      # Database 설정 (Neon PostgreSQL)
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SSL_MODE=${DB_SSL_MODE:-require}
+      
+      # Redis 설정 (Upstash)
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+      
+      # JWT 설정
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRATION=${JWT_ACCESS_TOKEN_EXPIRATION:-3600000}
+      - JWT_REFRESH_TOKEN_EXPIRATION=${JWT_REFRESH_TOKEN_EXPIRATION:-2592000000}
+      
+      # OAuth 설정 - Kakao
+      - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
+      - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+      
+      # OAuth 설정 - Google
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      
+      # OAuth 설정 - Naver
+      - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
+      - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
+      - NAVER_REDIRECT_URI=${NAVER_REDIRECT_URI}
+      
+      # Server 설정
+      - SERVER_PORT=${SERVER_PORT:-8080}
+    env_file:
+      - .env
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  transformerservice:
+    build:
+      context: ./ai.seoeunjin.com
+      dockerfile: transformerservice/Dockerfile
+    container_name: transformerservice
+    ports:
+      - "9000:9000"
+    networks:
+      - seoeunjin-network
+    volumes:
+      - ./ai.seoeunjin.com/transformerservice/app/koelectra/koelectra_model:/app/app/koelectra/koelectra_model # 모델 파일 마운트
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_SSL_ENABLED=${REDIS_SSL_ENABLED:-true}
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - USE_GPU=${USE_GPU:-false} # GPU 사용 여부 (기본값: false)
+    env_file:
+      - .env
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          memory: 4G # 모델 로딩을 위한 메모리 제한
+        reservations:
+          memory: 2G # 최소 메모리 보장
+
+# ========================================================================
+# Networks
+# ========================================================================
+networks:
+  seoeunjin-network:
+    driver: bridge
+    name: seoeunjin-network
+
+# ========================================================================
+# 사용법
+# ========================================================================
+# 1. .env 파일 생성: api.seoeunjin.com/ENV_TEMPLATE.txt를 참고하여 .env 파일 생성
+# 2. Neon PostgreSQL과 Upstash Redis 정보 입력
+# 3. OAuth 클라이언트 정보 입력 (Kakao, Google, Naver)
+# 4. 기본 실행 (gateway + transformerservice): docker compose up
+# 5. 백그라운드 실행: docker compose up -d
+# 6. 특정 서비스만 실행:
+#    - docker compose up gateway
+#    - docker compose up transformerservice
+# 7. 로그 확인: docker compose logs -f gateway
+# 8. 서비스 중지: docker compose down
+# ========================================================================
