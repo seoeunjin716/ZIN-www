@@ -83,7 +83,8 @@ export const useStore = create<AppStore>()(
           },
           user: {
             user: state.user?.user || null,
-            isLoggedIn: state.user?.isLoggedIn || false,
+            // ✅ access_token은 메모리에서만 관리하므로,
+            // isLoggedIn을 localStorage에 persist하지 않습니다.
           },
           // 카테고리별 상태 제거됨 (어드민 프론트엔드)
           // avatar, soccer는 제외 (임시 상태)

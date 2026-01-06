@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../atoms';
 import { SettingsView as SettingsViewType } from '../types';
 import { useStore } from '../../store';
+import { useAuthStore } from '../../store/authStore';
 import { updateUserNickname, fetchUserById } from '../../app/hooks/useUserApi';
 import { Input } from '../atoms/Input';
 
@@ -34,7 +35,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const styles = getCommonStyles(darkMode);
   const user = useStore((state) => state.user?.user);
   const login = useStore((state) => state.user?.login);
-  
+
   const [nickname, setNickname] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -46,12 +47,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     console.log('[SettingsView] performLogout 호출됨 - 강제 로그아웃 처리');
     if (typeof window !== 'undefined') {
       // 모든 상태 정리
-      localStorage.removeItem('access_token');
+      useAuthStore.getState().clearAccessToken();
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('auth_provider');
       localStorage.removeItem('app-storage');
       sessionStorage.clear();
-      
+
       // 모든 쿠키 삭제
       const cookies = document.cookie.split(';');
       cookies.forEach(cookie => {
@@ -63,7 +64,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=localhost`;
       });
-      
+
       // Zustand 상태도 초기화 (set 함수 사용)
       const store = useStore.getState();
       useStore.setState((state) => ({
@@ -73,7 +74,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           isLoggedIn: false,
         },
       }));
-      
+
       console.log('[SettingsView] 강제 로그아웃 완료 (쿠키 포함) - 페이지 이동');
       setTimeout(() => {
         window.location.replace('/');
@@ -148,16 +149,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       setSuccess(null);
 
       const updatedUser = await updateUserNickname(user.id, nickname.trim());
-      
+
       console.log('[SettingsView] 업데이트된 사용자 정보:', updatedUser);
       console.log('[SettingsView] 업데이트된 닉네임:', updatedUser?.nickname);
-      
+
       if (updatedUser) {
         // 닉네임을 명시적으로 String으로 변환
         const newNickname = String(updatedUser.nickname || updatedUser.name || nickname.trim());
         console.log('[SettingsView] 새 닉네임으로 state 업데이트:', newNickname, '타입:', typeof newNickname);
         setNickname(newNickname);
-        
+
         // Zustand 스토어 업데이트
         if (login) {
           login({
@@ -229,7 +230,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="max-w-2xl mx-auto space-y-6">
             <div className={`rounded-2xl border-2 p-8 shadow-lg ${styles.card}`}>
               <h2 className={`text-xl font-bold mb-6 ${styles.title}`}>닉네임 변경</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${styles.textSecondary}`}>
@@ -299,15 +300,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('[SettingsView] 로그아웃 버튼 클릭됨');
-                    
+
                     // useStore에서 직접 logout 함수 가져오기
                     const store = useStore.getState();
                     const logoutFn = store.user?.logout;
-                    
+
                     console.log('[SettingsView] store.user:', store.user);
                     console.log('[SettingsView] logoutFn 함수 존재:', !!logoutFn);
                     console.log('[SettingsView] logoutFn 함수 타입:', typeof logoutFn);
-                    
+
                     if (logoutFn && typeof logoutFn === 'function') {
                       console.log('[SettingsView] logout 함수 호출 시작');
                       try {

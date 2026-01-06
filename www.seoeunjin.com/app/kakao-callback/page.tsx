@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuthStore } from '@/service/authStore';
 
 export default function KakaoCallback() {
   const router = useRouter();
@@ -57,12 +58,12 @@ export default function KakaoCallback() {
         console.log('토큰 교환 응답:', data);
 
         if (data.success && data.access_token) {
-          // 토큰 저장
-          localStorage.setItem('access_token', data.access_token);
+          // ✅ access_token은 메모리(zustand)에만 저장
+          useAuthStore.getState().setAccessToken(data.access_token);
           if (data.refresh_token) {
             localStorage.setItem('refresh_token', data.refresh_token);
           }
-          
+
           // 사용자 정보 저장
           if (data.user) {
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -70,7 +71,7 @@ export default function KakaoCallback() {
 
           setStatus('success');
           setMessage('로그인 성공! 대시보드로 이동합니다...');
-          
+
           // 대시보드로 리다이렉트
           setTimeout(() => {
             router.push('/dashboard/kakao');

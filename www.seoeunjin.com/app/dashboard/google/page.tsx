@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/service/authStore';
 
 interface User {
   id: string;
@@ -16,6 +17,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const accessToken = useAuthStore.getState().accessToken;
         // 저장된 사용자 정보 불러오기
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -26,7 +28,6 @@ export default function Dashboard() {
             }
         } else {
             // 토큰이 있으면 사용자 정보 조회
-            const accessToken = localStorage.getItem('access_token');
             if (accessToken) {
                 fetchUserInfo(accessToken);
             } else {
@@ -63,7 +64,7 @@ export default function Dashboard() {
 
     const handleLogout = () => {
         // 토큰 및 사용자 정보 삭제
-        localStorage.removeItem('access_token');
+        useAuthStore.getState().clearAccessToken();
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         // 로그인 페이지로 리다이렉트

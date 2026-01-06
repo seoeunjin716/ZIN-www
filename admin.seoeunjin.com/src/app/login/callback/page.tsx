@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '../../../store';
+import { useAuthStore } from '../../../store/authStore';
 import { NicknameSetupModal } from '../../../components/molecules/NicknameSetupModal';
 import { updateUserNickname } from '../../hooks/useUserApi';
 
@@ -50,8 +51,8 @@ function OAuthCallbackContent() {
 
         console.log('[OAuthCallback] JWT 토큰 수신:', { provider, tokenLength: token.length });
 
-        // JWT 토큰을 localStorage에 저장
-        localStorage.setItem('access_token', token);
+        // ✅ access_token은 메모리(zustand)에만 저장
+        useAuthStore.getState().setAccessToken(token);
         if (refreshToken) {
           localStorage.setItem('refresh_token', refreshToken);
         }

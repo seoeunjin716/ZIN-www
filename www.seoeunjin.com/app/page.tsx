@@ -3,12 +3,14 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { handleGoogleLogin, handleKakaoLogin, handleNaverLogin } from '@/service/mainservice';
+import { useAuthStore } from '@/service/authStore';
 
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const setAccessToken = useAuthStore.getState().setAccessToken;
     // 구글 로그인 콜백 처리 (백엔드에서 토큰과 함께 리다이렉트)
     const token = searchParams.get('token');
     const refreshToken = searchParams.get('refresh_token');
@@ -16,14 +18,14 @@ export default function Home() {
     const errorDescription = searchParams.get('error_description');
 
     if (token) {
-      // JWT 토큰 저장
-      localStorage.setItem('access_token', token);
+      // ✅ access_token은 메모리(zustand)에만 저장
+      setAccessToken(token);
       if (refreshToken) {
         localStorage.setItem('refresh_token', refreshToken);
       }
 
       console.log('구글 로그인 성공, 토큰 저장 완료');
-      
+
       // 대시보드로 리다이렉트
       router.push('/dashboard/google');
     } else if (error) {

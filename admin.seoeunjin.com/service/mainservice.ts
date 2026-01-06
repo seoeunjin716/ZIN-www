@@ -1,5 +1,7 @@
 // 소셜 로그인 핸들러 함수들 (IIFE 패턴)
 
+import { useAuthStore } from '../src/store/authStore';
+
 export const createSocialLoginHandlers = (() => {
     // IIFE 내부: 공통 설정 및 변수 (private 스코프)
     const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
@@ -120,20 +122,20 @@ export const createSocialLoginHandlers = (() => {
 
             if (logoutSuccess) {
                 // 로그아웃 성공 시 토큰 제거 및 성공 콜백 실행
-                localStorage.removeItem('access_token');
+                useAuthStore.getState().clearAccessToken();
                 onSuccess();
             } else {
                 // 모든 provider 로그아웃 실패 시에도 토큰 제거하고 로그인 페이지로 이동
                 // (일부 provider는 로그아웃 API가 없을 수 있으므로 정상적인 경우일 수 있음)
                 console.info('ℹ️ 모든 provider 로그아웃 시도 완료, 로컬 토큰 제거합니다.');
-                localStorage.removeItem('access_token');
+                useAuthStore.getState().clearAccessToken();
                 // 에러 콜백을 호출하지 않고 바로 성공 처리 (정상적인 플로우)
                 onSuccess(); // 로그인 페이지로 이동
             }
         } catch (err) {
             // 예상치 못한 에러 발생 시에만 에러 콜백 호출
             console.warn('⚠️ 로그아웃 처리 중 예상치 못한 오류:', err);
-            localStorage.removeItem('access_token');
+            useAuthStore.getState().clearAccessToken();
             // 에러가 발생해도 로그인 페이지로 이동은 유지 (사용자 경험 우선)
             onSuccess(); // 로그인 페이지로 이동
             // onError는 호출하지 않음 (에러 페이지 표시 방지)
@@ -170,7 +172,7 @@ export const createSocialLoginHandlers = (() => {
 
         // 로그아웃 핸들러 (이너 함수 - 함수 선언식)
         function handleLogoutRequest(onSuccess: () => void, onError?: (error: string) => void) {
-            const token = localStorage.getItem('access_token');
+            const token = useAuthStore.getState().accessToken;
             if (!token) {
                 // 토큰이 없으면 바로 성공 처리 (이미 로그아웃된 상태)
                 onSuccess();

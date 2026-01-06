@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthStore } from '../src/store/authStore';
 
 export default function Home() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     // 토큰 확인
-    const token = localStorage.getItem('access_token');
+    const token = useAuthStore.getState().accessToken;
     setIsAuthenticated(!!token);
   }, []);
 

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useAuthStore } from '../src/store/authStore';
 
 function DashboardContent() {
     const router = useRouter();
@@ -29,8 +30,8 @@ function DashboardContent() {
                 }
 
                 if (tokenFromUrl) {
-                    // 토큰을 localStorage에 저장
-                    localStorage.setItem('access_token', tokenFromUrl);
+                    // ✅ access_token은 메모리(zustand)에만 저장
+                    useAuthStore.getState().setAccessToken(tokenFromUrl);
                     console.log('✅ 토큰 저장 성공:', tokenFromUrl.substring(0, 20) + '...');
                     console.log('✅ 소셜 로그인 성공! 토큰이 정상적으로 받아졌습니다.');
 
@@ -43,8 +44,8 @@ function DashboardContent() {
                     return;
                 }
 
-                // 2. localStorage에서 토큰 가져오기
-                const token = localStorage.getItem('access_token');
+                // 2. 메모리(zustand)에서 토큰 가져오기
+                const token = useAuthStore.getState().accessToken;
 
                 if (!token) {
                     // 토큰이 없으면 로그인 페이지로 이동
@@ -134,7 +135,7 @@ function DashboardContent() {
                     }
                 } else if (response.status === 401) {
                     console.error('❌ 인증 실패 (401)');
-                    localStorage.removeItem('access_token');
+                    useAuthStore.getState().clearAccessToken();
                     setError('인증이 필요합니다.');
                     router.push('/login');
                 } else {
