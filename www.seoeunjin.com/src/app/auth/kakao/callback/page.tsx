@@ -20,7 +20,7 @@ function KakaoCallbackContent() {
     // 백엔드로 code 전송 (POST)
     const loginWithKakao = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/user/kakao/callback', {
+        const response = await fetch('api.seoeunjin.com/api/user/kakao/callback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -23,7 +23,7 @@ export default function NaverDashboard() {
 
     const fetchUserInfo = useCallback(async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8080/naver/user', {
+            const response = await fetch('api.seoeunjin.com/naver/user', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -73,7 +73,7 @@ export default function NaverDashboard() {
         
         // 쿠키 삭제를 위한 백엔드 호출 (선택적)
         try {
-            await fetch('http://localhost:8080/naver/logout', {
+            await fetch('api.seoeunjin.com/naver/logout', {
                 method: 'POST',
                 credentials: 'include',
             });

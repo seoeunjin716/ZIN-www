@@ -22,7 +22,7 @@ export function clearAccessToken() {
 
 export const { handleGoogleLogin, handleKakaoLogin, handleNaverLogin } = (() => {
   // 외부 스코프 - 공통 설정 및 변수
-  const baseUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+  const baseUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
 
   /**
    * 구글 로그인 핸들러 (이너 함수)

@@ -23,7 +23,7 @@ export default function KakaoDashboard() {
 
     const fetchUserInfo = useCallback(async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8080/kakao/user', {
+            const response = await fetch('api.seoeunjin.com/kakao/user', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -73,7 +73,7 @@ export default function KakaoDashboard() {
         
         // 쿠키 삭제를 위한 백엔드 호출 (선택적)
         try {
-            await fetch('http://localhost:8080/kakao/logout', {
+            await fetch('api.seoeunjin.com/kakao/logout', {
                 method: 'POST',
                 credentials: 'include',
             });

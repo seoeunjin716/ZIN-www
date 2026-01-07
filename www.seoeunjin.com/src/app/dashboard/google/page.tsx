@@ -20,7 +20,7 @@ export default function GoogleDashboard() {
 
     const fetchUserInfo = useCallback(async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8080/google/user', {
+            const response = await fetch('api.seoeunjin.com/google/user', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -70,7 +70,7 @@ export default function GoogleDashboard() {
         
         // 쿠키 삭제를 위한 백엔드 호출 (선택적)
         try {
-            await fetch('http://localhost:8080/google/logout', {
+            await fetch('api.seoeunjin.com/google/logout', {
                 method: 'POST',
                 credentials: 'include',
             });
