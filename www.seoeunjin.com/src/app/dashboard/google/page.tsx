@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
+import { getGatewayBaseUrl } from '@/service/mainservice';
 
 interface User {
   id: string;
@@ -20,7 +21,7 @@ export default function GoogleDashboard() {
 
     const fetchUserInfo = useCallback(async (token: string) => {
         try {
-            const response = await fetch('api.seoeunjin.com/google/user', {
+            const response = await fetch(`${getGatewayBaseUrl()}/google/user`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -70,7 +71,7 @@ export default function GoogleDashboard() {
         
         // 쿠키 삭제를 위한 백엔드 호출 (선택적)
         try {
-            await fetch('api.seoeunjin.com/google/logout', {
+            await fetch(`${getGatewayBaseUrl()}/google/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });

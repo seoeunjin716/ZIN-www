@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import Image from 'next/image';
+import { getGatewayBaseUrl } from '@/service/mainservice';
 
 interface User {
   kakao_id: string;
@@ -23,7 +24,7 @@ export default function KakaoDashboard() {
 
     const fetchUserInfo = useCallback(async (token: string) => {
         try {
-            const response = await fetch('api.seoeunjin.com/kakao/user', {
+            const response = await fetch(`${getGatewayBaseUrl()}/kakao/user`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -73,7 +74,7 @@ export default function KakaoDashboard() {
         
         // 쿠키 삭제를 위한 백엔드 호출 (선택적)
         try {
-            await fetch('api.seoeunjin.com/kakao/logout', {
+            await fetch(`${getGatewayBaseUrl()}/kakao/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });
