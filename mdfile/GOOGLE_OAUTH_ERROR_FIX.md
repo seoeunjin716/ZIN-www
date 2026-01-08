@@ -51,7 +51,7 @@ The OAuth client was not found.
    - 이름: `seoeunjin OAuth Client` (또는 원하는 이름)
    - 승인된 리다이렉트 URI 추가:
      ```
-     http://localhost:8080/auth/google/callback
+     api.seoeunjin.com/auth/google/callback
      http://localhost:4000/login/callback
      ```
      (프로덕션 환경의 경우 실제 도메인도 추가)
@@ -67,14 +67,14 @@ The OAuth client was not found.
 # Google OAuth 설정
 GOOGLE_CLIENT_ID=여기에_실제_클라이언트_ID_붙여넣기
 GOOGLE_CLIENT_SECRET=여기에_실제_클라이언트_시크릿_붙여넣기
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 **예시:**
 ```env
 GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 ### 3단계: Docker 컨테이너 재시작
@@ -124,7 +124,7 @@ docker compose restart oauthservice
 **해결:**
 1. Google Cloud Console > 사용자 인증 정보 > OAuth 클라이언트 ID 편집
 2. "승인된 리다이렉트 URI"에 다음 추가:
-   - `http://localhost:8080/auth/google/callback`
+   - `api.seoeunjin.com/auth/google/callback`
    - `http://localhost:4000/login/callback`
    - 프로덕션 도메인 (배포 시)
 
@@ -178,7 +178,7 @@ OAuth Service
 
 - [ ] `GOOGLE_CLIENT_ID` - Google Cloud Console에서 생성한 클라이언트 ID
 - [ ] `GOOGLE_CLIENT_SECRET` - Google Cloud Console에서 생성한 클라이언트 시크릿
-- [ ] `GOOGLE_REDIRECT_URI` - OAuth 콜백 URI (일반적으로 `http://localhost:8080/auth/google/callback`)
+- [ ] `GOOGLE_REDIRECT_URI` - OAuth 콜백 URI (일반적으로 `api.seoeunjin.com/auth/google/callback`)
 
 ## 🚀 빠른 해결 체크리스트
 

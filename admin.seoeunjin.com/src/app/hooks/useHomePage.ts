@@ -369,7 +369,7 @@ export const useHomePage = () => {
         // Gateway를 통한 API 호출
         const gatewayUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 
                           process.env.NEXT_PUBLIC_API_BASE_URL || 
-                          'http://localhost:8080';
+                          'api.seoeunjin.com';
         
         // 검색어 추출 (축구 관련 키워드만 추출)
         let searchKeyword = submitText;

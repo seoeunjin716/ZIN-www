@@ -17,7 +17,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret  ❌ 플레이스홀더
 $ docker compose exec oauthservice env | findstr GOOGLE
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 ### 로그에서 확인된 문제
@@ -55,7 +55,7 @@ The OAuth client was not found.
 4. 이름: `seoeunjin OAuth Client`
 5. **승인된 리다이렉트 URI** 추가:
    ```
-   http://localhost:8080/auth/google/callback
+   api.seoeunjin.com/auth/google/callback
    http://localhost:4000/login/callback
    ```
 6. "만들기" 클릭
@@ -69,14 +69,14 @@ The OAuth client was not found.
 ```env
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 #### 수정 후 (실제 값으로 교체)
 ```env
 GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 **⚠️ 주의:**
@@ -105,7 +105,7 @@ docker compose exec oauthservice env | findstr GOOGLE
 ```
 GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 #### 브라우저에서 테스트
@@ -142,14 +142,14 @@ YOUR_CLIENT_ID_HERE            ❌
 ### Kakao OAuth
 ```env
 KAKAO_REST_API_KEY=실제_카카오_REST_API_키
-KAKAO_REDIRECT_URI=http://localhost:8080/auth/kakao/callback
+KAKAO_REDIRECT_URI=api.seoeunjin.com/auth/kakao/callback
 ```
 
 ### Naver OAuth (추가 시)
 ```env
 NAVER_CLIENT_ID=실제_네이버_클라이언트_ID
 NAVER_CLIENT_SECRET=실제_네이버_클라이언트_시크릿
-NAVER_REDIRECT_URI=http://localhost:8080/auth/naver/callback
+NAVER_REDIRECT_URI=api.seoeunjin.com/auth/naver/callback
 ```
 
 ## 💡 .env 파일 템플릿 vs 실제 파일

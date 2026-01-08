@@ -39,7 +39,7 @@ export const createSoccerSlice: StateCreator<
     try {
       const gatewayUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 
                         process.env.NEXT_PUBLIC_API_BASE_URL || 
-                        'http://localhost:8080';
+                        'api.seoeunjin.com';
       
       // Gateway 라우팅: /soccer/** → soccer-service:8085
       const apiUrl = `${gatewayUrl}/soccer/soccer/findByWord?keyword=${encodeURIComponent(keyword)}`;

@@ -62,7 +62,7 @@ function DashboardContent() {
                 }
 
                 // 3. 백엔드 API로 현재 사용자 정보 조회
-                const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+                const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
 
                 console.log('🔍 사용자 정보 조회 시작, 토큰:', token.substring(0, 20) + '...');
 

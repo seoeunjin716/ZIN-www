@@ -129,7 +129,7 @@ python common/database.py
 
 ```bash
 # 서비스 실행 후 헬스 체크
-curl http://localhost:8080/actuator/health
+curl api.seoeunjin.com/actuator/health
 curl http://localhost:8081/actuator/health
 ```
 

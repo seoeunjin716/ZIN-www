@@ -60,7 +60,7 @@ export const createSocialLoginHandlers = (() => {
     // └─────────────────────────────────────────┘
     
     // 1. 공통 설정 (Private)
-    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
     
     // 2. Private 헬퍼 함수들
     async function handleLogin(provider, setIsLoading, setError) {
@@ -211,7 +211,7 @@ export const createSocialLoginHandlers = (() => {
 ┌─────────────────────────────────────────────────────────┐
 │  5. Backend API 호출                                     │
 ├─────────────────────────────────────────────────────────┤
-│  POST http://localhost:8080/auth/google/login          │
+│  POST api.seoeunjin.com/auth/google/login          │
 │                                                          │
 │  Response:                                               │
 │  {                                                       │
@@ -307,7 +307,7 @@ export const createSocialLoginHandlers = (() => {
 ┌─────────────────────────────────────────────────────────┐
 │  5. Backend API 호출                                     │
 ├─────────────────────────────────────────────────────────┤
-│  POST http://localhost:8080/api/auth/login             │
+│  POST api.seoeunjin.com/api/auth/login             │
 │                                                          │
 │  Request Body:                                           │
 │  {                                                       │
@@ -346,7 +346,7 @@ export const createSocialLoginHandlers = (() => {
 **Private 변수를 클로저로 캡처:**
 
 ```typescript
-const gatewayUrl = 'http://localhost:8080'; // Private
+const gatewayUrl = 'api.seoeunjin.com'; // Private
 
 return (setters) => {
     function handleGoogleLogin() {
@@ -671,7 +671,7 @@ const [isLoading, setIsLoading] = useState(false);
 const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL;
 
 // ❌ 하드코딩
-const gatewayUrl = 'http://localhost:8080';
+const gatewayUrl = 'api.seoeunjin.com';
 ```
 
 ### 2. credentials: 'include'

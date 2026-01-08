@@ -22,7 +22,22 @@ export function clearAccessToken() {
 
 export const { handleGoogleLogin, handleKakaoLogin, handleNaverLogin } = (() => {
   // 외부 스코프 - 공통 설정 및 변수
-  const baseUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
+  // 프로토콜이 없으면 자동으로 추가 (로컬 개발: http://localhost:8080, 프로덕션: https://api.seoeunjin.com)
+  const getBaseUrl = () => {
+    const url = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
+    // 이미 프로토콜이 있으면 그대로 사용
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // 프로토콜이 없으면 프로덕션 환경에서는 https, 로컬에서는 http 사용
+    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+    // 로컬 개발 환경 감지 (localhost 또는 127.0.0.1)
+    if (url.includes('localhost') || url.includes('127.0.0.1')) {
+      return `http://${url}`;
+    }
+    return `${protocol}//${url}`;
+  };
+  const baseUrl = getBaseUrl();
 
   /**
    * 구글 로그인 핸들러 (이너 함수)

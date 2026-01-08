@@ -4,7 +4,7 @@ import { useAuthStore } from '../src/store/authStore';
 
 export const createSocialLoginHandlers = (() => {
     // IIFE 내부: 공통 설정 및 변수 (private 스코프)
-    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:8080';
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'api.seoeunjin.com';
 
     // 공통 로그인 처리 로직 (private 헬퍼 함수)
     async function handleLogin(

@@ -76,10 +76,10 @@ JWT_REFRESH_TOKEN_EXPIRATION=2592000000
 # OAuth 설정
 # ========================================================================
 KAKAO_REST_API_KEY=your_kakao_rest_api_key
-KAKAO_REDIRECT_URI=http://localhost:8080/auth/kakao/callback
+KAKAO_REDIRECT_URI=api.seoeunjin.com/auth/kakao/callback
 GOOGLE_CLIENT_ID= 
 
-GOOGLE_REDIRECT_URI=http://localhost:8080/auth/google/callback
+GOOGLE_REDIRECT_URI=api.seoeunjin.com/auth/google/callback
 ```
 
 ## ✅ 설정 확인
