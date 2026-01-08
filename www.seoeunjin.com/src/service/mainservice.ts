@@ -29,13 +29,12 @@ export const { handleGoogleLogin, handleKakaoLogin, handleNaverLogin } = (() => 
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    // 프로토콜이 없으면 프로덕션 환경에서는 https, 로컬에서는 http 사용
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
     // 로컬 개발 환경 감지 (localhost 또는 127.0.0.1)
     if (url.includes('localhost') || url.includes('127.0.0.1')) {
       return `http://${url}`;
     }
-    return `${protocol}//${url}`;
+    // ✅ 비로컬 도메인은 무조건 https 사용 (http로 호출하면 301/302 리다이렉트가 걸려 preflight가 실패함)
+    return `https://${url}`;
   };
   const baseUrl = getBaseUrl();
 
